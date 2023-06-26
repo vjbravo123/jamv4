@@ -13,11 +13,13 @@ const express = require("express");
 const Router = express.Router();
 const addnew= require('./controller/addnew')
 const attendance_dataprovider = require("./login validation/attendance_finder")
+const teachercredupdating = require("./controller/teachercredupdate")
 
 
 Router.get('/',logger)
 Router.post('/login/:collection',cred_check);
 Router.post('/adminlogin/:collection',cred_check);
+Router.post('/teachercredlogin/:collection',cred_check);
 Router.get('/api/documents/:db',queries );
 
 Router.post('/queryattendance/:db/:collection',queryattendance)
@@ -40,6 +42,10 @@ Router.get("/attendancetabledata/:db/:collection",attendance_datafunc)
 Router.get("/dataviewer",attendance_datafunc);
 
 Router.post('/api/addnew',addnew)
+
+Router.get("/api/subjects/:collection/:state",teachercredupdating);
+Router.post("/api/subjects/:collection/:state",teachercredupdating);
+
 
 
 module.exports=Router;

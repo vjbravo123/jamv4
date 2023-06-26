@@ -1,16 +1,7 @@
 let client = require("../database/client_connector");
 
 const getCollections = async (dbname) => {
-  // MONGODB_URI = "mongodb+srv://escanor:vj1212@cluster0.9mok6ao.mongodb.net/?retryWrites=true";
-  // const { MongoClient } = require('mongodb');
 
-
-  // // const client = new MongoClient(MONGODB_URI);
-
-  // client.connect((err) => {
-  //   if (err) throw err;
-  //   console.log('MongoDB Connected!');
-  // });
   const subarr = [];
   try {
     console.log('Connected to MongoDB');

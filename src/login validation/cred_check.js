@@ -47,6 +47,7 @@ const cred_check = async (req, res) => {
             console.log(result);
 
             const result2 =await getCollections(result[0].Subcourse);
+            result2.push(result[0].Username)
             console.log(result2);
        
             
