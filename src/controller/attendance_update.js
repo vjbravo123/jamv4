@@ -3,8 +3,9 @@ const { ObjectId } = require("mongodb");
 
 const queried_attendance_update = async (req, res) => {
   const collection = client.db(req.params.db).collection(req.params.collection)
-  const aob = req.body
-  let documents = aob;
+  
+  //this is the array of objects of attendance of that student
+  let documents = req.body;
   for (let i = 0; i < documents.length; i++) {
     const idToSearchFor = documents[i]._id;
     let filter = { _id: new ObjectId(idToSearchFor) }
@@ -13,7 +14,7 @@ const queried_attendance_update = async (req, res) => {
     console.log(result.modifiedCount + " document(s) updated");
   }
 
-  let a = { ans: 'donebro' }
-  res.send(a)
+  let response= { message: "Student query deleted successfully" }
+  res.send(response)
 }
 module.exports = queried_attendance_update;

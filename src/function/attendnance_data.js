@@ -1,28 +1,21 @@
 const client = require("../database/client_connector");
 
-const attendance_datafunc=async(req,res)=>{
-    const collection = client.db(req.params.db).collection("students_details");//students details*
-    const data=await collection.find().toArray().then()
-    await data.sort((a, b) => a.sno - b.sno);
-    res.send(data);
-    return data;
-}
-module.exports=attendance_datafunc;
+//this function is used for getting all the students details for attendance taking purpose
+const attendance_datafunc = async (req, res) => {
+    try {
+        //database will be specified in the params
+        const collection = client.db(req.params.db).collection("students_details");
 
+        //sorting the data for better displaying
+        const data = await collection.find().sort({ sno: 1 }).toArray();
 
-/*
-teachers dashboard------it has two options take attendance and students queries
-1st---it sends request to /attendancetabledata (it gets attendance db->students_details)
+        
+        res.status(200).json({ status: "success", data: data });
+        return data;
+    } catch (err) {
+        console.log("Error:", err);
+        res.status(500).json({ status: "error", error: "Internal Server Error" });
+    }
+};
 
-the attendance component populate table with data and sends an object of roll_nos who are present
-
-
-
-
-
-2nd---it sends request to /api/documents (it gets students_queries db->qurey collection)
-
-
-
-
-*/
+module.exports = attendance_datafunc;

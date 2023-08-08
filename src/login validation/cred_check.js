@@ -4,14 +4,20 @@ const getCollections = require('../function/db_subjects.js')
 
 const cred_check = async (req, res) => {
 
+    //taking out name and password from the req body
     const name = req.body.Username;
     const password = req.body.Password;
 
+    //Making filter with name and password
     const filter = { "Username": name, "Password": password }
+
+    //Here the collection name is in the req parameters 
     console.log(filter , req.params.collection);
 
+    //All the credentials are in the Credentials database
     let collection_reference = client.db('Credentials').collection(req.params.collection);
 
+    //checkinh if the credentials are there in the collection
     const result = await collection_reference.find(filter).toArray().then();
     const docCount = result.length;
 

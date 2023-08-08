@@ -1,28 +1,32 @@
 const client = require("../database/client_connector");
 
+const attendanceFinder = async (req, res) => {
+    try {
+        const dbName = req.body.dbname;
+        const subject = req.body.Subject;
+        const rollNo = req.body.roll_no;
 
-const attendance_finder = async (req ,res) => {
+        const collection = client.db(dbName).collection(subject);
+        console.log("Request body:", req.body);
 
-    const collection = client.db(req.body.dbname).collection(req.body.Subject)
-    console.log(req.body);
-    let present_count = 0;
+        const result = await collection.find({ roll_no: rollNo }).toArray();
 
-    let result = await collection.find({ roll_no:req.body.roll_no }).toArray();
-
-    for (let i = 0; i < result.length; i++) {
-        if (result[i].attendance_status === "Present") {
-            present_count++;
+        let presentCount = 0;
+        for (const record of result) {
+            if (record.attendance_status === "Present") {
+                presentCount++;
+            }
         }
+
+        console.log("Query result:", result);
+        console.log("Present count:", presentCount);
+
+        const responseObj = { attendance: presentCount, attendance_data: result };
+        res.json(responseObj);
+    } catch (error) {
+        console.error("Error in attendanceFinder:", error);
+        res.status(500).json({ error: "An internal server error occurred." });
     }
+};
 
-    console.log(result);
-    console.log(present_count);
-
-    // let obj = { present_count: present_count, result: result }
-
-    let obj ={attendance:present_count ,attendance_data:result }
-    res.json(obj);
-}
-module.exports=attendance_finder;
-
-
+module.exports = attendanceFinder;

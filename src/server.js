@@ -18,8 +18,7 @@ const corsOptions = {
 
 //CORS-CROSS ORIGIN RESOURCE SHARING FOR USING BY ANOTHER DEVICES OR ORIGIN
 app.use(cors(corsOptions));
-// app.use(cors());
-// app.use(cors());
+
 //TO PARSE THE REQUEST BODY 
 app.use(bodyParser.json());
 

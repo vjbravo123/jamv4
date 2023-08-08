@@ -1,6 +1,6 @@
 const { ObjectId } = require("mongodb");
 const client = require("../database/client_connector")
-const db_data_inserter = require('../controller/insert_data_to_db');
+// const db_data_inserter = require('../controller/insert_data_to_db');
 
 const signup = async (req, res) => {
     const { year, subCourse } = req.body;
