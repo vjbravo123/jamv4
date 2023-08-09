@@ -58,7 +58,8 @@ const updateAttendanceStatus = async (attendanceData, dbname, collectionname, da
             takeattendance()
         }
         else{
-            let obj = { message: "Today's Attendance is taken already" , val : true }
+            console.log("first");
+            let obj = { message: "Today's Attendance is already taken " , val : true }
                return res.json(obj)
         }
     }

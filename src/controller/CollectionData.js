@@ -4,64 +4,125 @@ const client = require("../database/client_connector");
 function parseDate(dateStr) {
   const parts = dateStr.split('/');
   const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // Subtracting 1 to convert to 0-indexed month
+  const month = parseInt(parts[1], 10) - 1;
   const year = parseInt(parts[2], 10);
   return new Date(year, month, day);
 }
 
 const CollectionData = async (req, res, next) => {
-  //   const client = new MongoClient(url);
-
   try {
     await client.connect();
-    const dbName = req.params.dbName; // Get the database name from the request parameters
-    const collectionName = req.params.collectionName; // Get the collection name from the request parameters
+    const dbName = req.params.dbName;
+    const collectionName = req.params.collectionName;
 
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
     const today = new Date();
-    const currentMonth = today.getMonth() + 1; // Adding 1 because getMonth() returns 0-indexed months
+    const currentMonth = today.getMonth() + 1;
     const currentYear = today.getFullYear();
 
-    // Set the start and end dates for the current month
     const startDate = new Date(`${currentMonth}/1/${currentYear}`);
     const endDate = new Date(`${currentMonth + 1}/1/${currentYear}`);
 
-    // Fetch attendance data for the current month
     const attendanceData = await collection.find().toArray();
 
-    // Filter attendance data for the current month
     const filteredAttendanceData = attendanceData.filter((data) => {
       const dataDate = parseDate(data.date);
       return dataDate >= startDate && dataDate < endDate;
     });
 
-    // Fetch student details
     const studentDetailsCollection = db.collection('students_details');
     const studentDetails = await studentDetailsCollection.find().toArray();
 
+    let studentAttendanceMap = new Map();
+
+    for (let i = 0; i < filteredAttendanceData.length; i++) {
+      const data = filteredAttendanceData[i];
+      const rollNo = data.roll_no;
+      const attendanceStatus = data.attendance_status;
+      const dateString = data.date;
+
+      if (!studentAttendanceMap.has(rollNo)) {
+        studentAttendanceMap.set(rollNo, new Map());
+      }
+
+      const dateAttendanceMap = studentAttendanceMap.get(rollNo);
+      if (dateAttendanceMap.has(dateString)) {
+        const existingStatus = dateAttendanceMap.get(dateString);
+        if (existingStatus.includes('A') && attendanceStatus.includes('P')) {
+          dateAttendanceMap.set(dateString, 'AP');
+        } else if (existingStatus.includes('P') && attendanceStatus.includes('A')) {
+          dateAttendanceMap.set(dateString, 'PA');
+        } else if (existingStatus.includes('A') && attendanceStatus.includes('A')) {
+          dateAttendanceMap.set(dateString, 'AA');
+        } else if (existingStatus.includes('P') && attendanceStatus.includes('P')) {
+          dateAttendanceMap.set(dateString, 'PP');
+        }
+      } else {
+        dateAttendanceMap.set(dateString, attendanceStatus);
+      }
+    }
+
     let arr = [];
-
     for (let i = 0; i < studentDetails.length; i++) {
-      let object = { sno: studentDetails[i].sno, name: studentDetails[i].name };
-      let totalPresents = 0; // Variable to count total presents for each student
-
-      for (let j = 0; j < filteredAttendanceData.length; j++) {
-        if (filteredAttendanceData[j].roll_no === studentDetails[i].roll_no) {
-          const attendanceStatus = filteredAttendanceData[j].attendance_status === 'Present' ? 'P' : 'A';
-          const dateString = filteredAttendanceData[j].date;
-          object[dateString] = `${dateString}${attendanceStatus}`;
-          if (attendanceStatus === 'P') {
-            totalPresents++; // Increment total presents for this student
+      const studentDetail = studentDetails[i];
+      const rollNo = studentDetail.roll_no;
+    
+      const dateAttendanceMap = studentAttendanceMap.get(rollNo);
+      if (!dateAttendanceMap) continue;
+    
+      let object = { sno: studentDetail.sno, name: studentDetail.name };
+      let totalPresents = 0;
+      let totalAbsents = 0;
+    
+      let dateStatus = {}; // Store the combined status for each date
+    
+      for (const [dateString, status] of dateAttendanceMap.entries()) {
+        if (status.includes('P')) {
+          totalPresents++;
+        }
+        if (status.includes('A')) {
+          totalAbsents++;
+        }
+    
+        if (!dateStatus[dateString]) {
+          dateStatus[dateString] = status;
+        } else {
+          const existingStatus = dateStatus[dateString];
+          if (existingStatus.includes('P') && status.includes('A')) {
+            dateStatus[dateString] = 'PA';
+          } else if (existingStatus.includes('A') && status.includes('P')) {
+            dateStatus[dateString] = 'PA';
+          } else if (existingStatus.includes('A') && status.includes('A')) {
+            dateStatus[dateString] = 'AA';
+          } else if (existingStatus.includes('P') && status.includes('P')) {
+            dateStatus[dateString] = 'PP';
           }
         }
       }
-
-      object['Total_Present'] = totalPresents; // Add total presents to the object
+    
+      for (const [dateString, status] of Object.entries(dateStatus)) {
+        object[dateString] = status;
+      }
+    
+      let overallStatus = '';
+      if (totalPresents > 0 && totalAbsents > 0) {
+        overallStatus = 'PA';
+      } else if (totalPresents > 0) {
+        overallStatus = 'P';
+      } else if (totalAbsents > 0) {
+        overallStatus = 'A';
+      }
+    
+      object['Total_Present'] = totalPresents;
+      object['Total_Absent'] = totalAbsents;
+      object['Overall_Status'] = overallStatus;
       arr.push(object);
-    }
+    } 
+    
 
+    console.log(arr[0]);
     res.json(arr);
   } catch (err) {
     console.error(err);
