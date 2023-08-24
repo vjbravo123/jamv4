@@ -53,7 +53,7 @@ Router.post('/studentAttendancePage', attendance_finder)
 
 
 //Route 12 This route is for inserting a students query to students query collection
-Router.post('/students-queries/:db/', inserting_query_to_db);
+Router.post('/students-queries/:dbname/', inserting_query_to_db);
 
 
 //Route 13 This route is for the students signup

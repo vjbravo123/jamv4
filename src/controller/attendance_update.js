@@ -14,7 +14,7 @@ const queried_attendance_update = async (req, res) => {
     console.log(result.modifiedCount + " document(s) updated");
   }
 
-  let response= { message: "Student query deleted successfully" }
+  let response= { success:true ,message: "Attendance Updated successfully" }
   res.send(response)
 }
 module.exports = queried_attendance_update;

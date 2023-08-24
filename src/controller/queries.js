@@ -7,6 +7,7 @@ const queries = async (req, res) => {
     const result = await collection.find().toArray();
 
     if (result.length === 0) {
+      console.log(result);
       // If no documents found, return a 404 Not Found status
       return res.status(404).json({ success: false, message: 'No data found' });
     }

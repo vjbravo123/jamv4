@@ -41,7 +41,7 @@ const addNew = async (req, res, next) => {
 
   // Convert each row into an object
   const array = rows.map(row => {
-    const [sno, , , , year, roll_no, name] = row.split('\t');
+    const [sno, , , , year, roll_no, ,name] = row.split('\t');
     return { sno: parseInt(sno), year: getYearFromPart(year), roll_no, name };
   });
 

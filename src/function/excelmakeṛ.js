@@ -1,6 +1,6 @@
 const ExcelJS = require('exceljs');
 
-const excelmaker = async (present, data, res) => {
+const excelmaker = async (present, data) => {
   try {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('My Sheet');
@@ -35,13 +35,10 @@ const excelmaker = async (present, data, res) => {
     });
   
     const buffer = await workbook.xlsx.writeBuffer();
-  
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=myFile.xlsx');
-    res.status(200).send({ success: true, message: "Excel file generated successfully.", data: buffer });
+    return buffer;
   } catch (error) {
     console.error(error);
-    res.status(500).send({ success: false, message: "An error occurred while generating the Excel file." });
+    throw new Error("An error occurred while generating the Excel file.");
   }
 };
 
