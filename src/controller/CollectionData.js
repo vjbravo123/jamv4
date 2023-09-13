@@ -14,16 +14,13 @@ const CollectionData = async (req, res, next) => {
     await client.connect();
     const dbName = req.params.dbName;
     const collectionName = req.params.collectionName;
+    const currentMonth = parseInt(req.query.month); // Get currentMonth from the query
 
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const currentYear = today.getFullYear();
-
-    const startDate = new Date(`${currentMonth}/1/${currentYear}`);
-    const endDate = new Date(`${currentMonth + 1}/1/${currentYear}`);
+    const startDate = new Date(`${currentMonth + 1}/1/${new Date().getFullYear()}`);
+    const endDate = new Date(`${currentMonth + 2}/1/${new Date().getFullYear()}`);
 
     const attendanceData = await collection.find().toArray();
 
@@ -122,7 +119,7 @@ const CollectionData = async (req, res, next) => {
     } 
     
 
-    console.log(arr[0]);
+  
     res.json(arr);
   } catch (err) {
     console.error(err);

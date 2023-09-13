@@ -1,4 +1,7 @@
 let client = require("../database/client_connector");
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = 'Jam@v4'
 const getCollections = require('../function/db_subjects.js')
 const teachercredupdating = async (req, res) => {
     if (req.params.state === "subject") {
@@ -17,7 +20,9 @@ const teachercredupdating = async (req, res) => {
         const Subcourse = req.body.Subcourse;
         const Subject = req.body.Subject;
 
-        const TeacherCreds = { Username: Username, Password: Password, Course: Course, Subcourse: Subcourse, Subject: Subject }
+        const salt = await bcrypt.genSalt(10)
+        let securePass = await bcrypt.hash(Password,salt)
+        const TeacherCreds = { Username: Username, Password: securePass, Course: Course, Subcourse: Subcourse, Subject: Subject }
 
         console.log("creds");
         console.log(req.body);
@@ -25,10 +30,11 @@ const teachercredupdating = async (req, res) => {
 
         try {
             let dbName = "Credentials"
-            let collectionName = "Teachers"
+            let collectionName = "users"
 
             const collectionReference = client.db(dbName).collection(collectionName);
-            await collectionReference.insertOne(TeacherCreds);
+            const CreatedUser= await collectionReference.insertOne(TeacherCreds);
+            console.log(CreatedUser);
 
             console.log(`${JSON.stringify(TeacherCreds)} is inserted in the "${dbName}" database in the "${collectionName}" collection.`);
 
