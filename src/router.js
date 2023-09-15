@@ -15,7 +15,7 @@ const attendance_finder = require("./login validation/attendance_finder")
 const teachercredupdating = require("./controller/teachercredupdate")
 const CollectionData = require("./controller/CollectionData")
 const dbList = require('./controller/dblist')
-const GetStudentIds = require('./controller/getStudentids')
+const GetStudentIds = require('./controller/getStudentIds')
 const Sendmail =require('./controller/SendMail')
 
 //Route 1
