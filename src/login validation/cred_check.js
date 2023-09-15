@@ -13,7 +13,7 @@ const cred_check = async (req, res) => {
     
     const filter = { "Username": name };
 
-    console.log(filter, req.params.collection);
+    // console.log(filter, req.params.collection);
 
     const documentsWithUsername = await collection_reference.find(filter).toArray();
     let result = null;
@@ -27,16 +27,16 @@ const cred_check = async (req, res) => {
             passwordCompare = await bcrypt.compare(password, doc.Password);
             if (passwordCompare) {
                 result = doc; // Save the matched document in the result variable
-                console.log("Password matches for at least one document");
+                // console.log("Password matches for at least one document");
                 break; // No need to check further once a match is found
             }
         }
     
-        if (result) {
-            console.log("Document with matching password:", result);
-        } else {
-            console.log("Password does not match for any document");
-        }
+        // if (result) {
+        //     console.log("Document with matching password:", result);
+        // } else {
+        //     console.log("Password does not match for any document");
+        // }
     }
     
 

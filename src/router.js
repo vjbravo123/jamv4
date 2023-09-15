@@ -14,6 +14,9 @@ const addnew = require('./controller/addnew')
 const attendance_finder = require("./login validation/attendance_finder")
 const teachercredupdating = require("./controller/teachercredupdate")
 const CollectionData = require("./controller/CollectionData")
+const dbList = require('./controller/dblist')
+const GetStudentIds = require('./controller/getStudentids')
+const Sendmail =require('./controller/SendMail')
 
 //Route 1
 Router.get('/', logger)
@@ -74,8 +77,12 @@ Router.post('/adminlogin/:collection', cred_check);
 //Route 17 this route is to add student details of a particular course
 Router.post('/api/addnew', addnew)
  
+Router.get("/getDatabases", dbList);
 
 
+Router.get("/getStudentIds",GetStudentIds);
+
+Router.post("/sendEmail", Sendmail);
 
 
 module.exports = Router;
